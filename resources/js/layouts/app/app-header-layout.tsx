@@ -8,7 +8,9 @@ export default function AppHeaderLayout({ children, breadcrumbs }: PropsWithChil
     return (
         <AppShell>
             <AppHeader breadcrumbs={breadcrumbs} />
-            <AppContent>{children}</AppContent>
+            <AppContent className="p-4 md:p-6">
+                {children}
+            </AppContent>
         </AppShell>
     );
 }
