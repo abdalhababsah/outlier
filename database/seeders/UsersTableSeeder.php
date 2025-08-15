@@ -14,34 +14,11 @@ class UsersTableSeeder extends Seeder
      */
     public function run(): void
     {
-        // Ensure roles exist
-        $superAdminRole = Role::firstOrCreate([
-            'name' => 'super_admin',
-        ], [
-            'display_name' => 'Super Administrator',
-            'description' => 'Full system access - no permission checks',
-        ]);
-
-        $adminRole = Role::firstOrCreate([
-            'name' => 'admin',
-        ], [
-            'display_name' => 'Administrator',
-            'description' => 'Admin dashboard with role/permission management',
-        ]);
-
-        $projectOwnerRole = Role::firstOrCreate([
-            'name' => 'project_owner',
-        ], [
-            'display_name' => 'Project Owner',
-            'description' => 'Project owner dashboard - no permissions needed',
-        ]);
-
-        $staffRole = Role::firstOrCreate([
-            'name' => 'staff',
-        ], [
-            'display_name' => 'Staff',
-            'description' => 'Staff dashboard - no permissions needed',
-        ]);
+        // Get roles from database (created by migration)
+        $superAdminRole = Role::where('name', 'super_admin')->first();
+        $adminRole = Role::where('name', 'admin')->first();
+        $projectOwnerRole = Role::where('name', 'project_owner')->first();
+        $staffRole = Role::where('name', 'staff')->first();
 
         // Create users for each role
         $superAdmin = User::firstOrCreate([
@@ -51,7 +28,9 @@ class UsersTableSeeder extends Seeder
             'password' => Hash::make('password'),
             'email_verified_at' => now(),
         ]);
-        $superAdmin->addRole($superAdminRole);
+        if ($superAdminRole) {
+            $superAdmin->addRole($superAdminRole);
+        }
 
         $admin = User::firstOrCreate([
             'email' => 'admin@example.com',
@@ -60,7 +39,9 @@ class UsersTableSeeder extends Seeder
             'password' => Hash::make('password'),
             'email_verified_at' => now(),
         ]);
-        $admin->addRole($adminRole);
+        if ($adminRole) {
+            $admin->addRole($adminRole);
+        }
 
         $projectOwner = User::firstOrCreate([
             'email' => 'owner@example.com',
@@ -69,7 +50,9 @@ class UsersTableSeeder extends Seeder
             'password' => Hash::make('password'),
             'email_verified_at' => now(),
         ]);
-        $projectOwner->addRole($projectOwnerRole);
+        if ($projectOwnerRole) {
+            $projectOwner->addRole($projectOwnerRole);
+        }
 
         $staff = User::firstOrCreate([
             'email' => 'staff@example.com',
@@ -78,7 +61,9 @@ class UsersTableSeeder extends Seeder
             'password' => Hash::make('password'),
             'email_verified_at' => now(),
         ]);
-        $staff->addRole($staffRole);
+        if ($staffRole) {
+            $staff->addRole($staffRole);
+        }
     }
 }
 

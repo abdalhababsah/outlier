@@ -19,6 +19,7 @@ class LaratrustSetupTables extends Migration
             $table->string('name')->unique();
             $table->string('display_name')->nullable();
             $table->string('description')->nullable();
+            $table->foreignId('dashboard_type_id')->constrained('dashboard_types');
             $table->timestamps();
         });
 
@@ -28,6 +29,7 @@ class LaratrustSetupTables extends Migration
             $table->string('name')->unique();
             $table->string('display_name')->nullable();
             $table->string('description')->nullable();
+            $table->foreignId('dashboard_type_id')->nullable()->constrained('dashboard_types');
             $table->timestamps();
         });
 

@@ -2,33 +2,53 @@ import { NavFooter } from '@/components/nav-footer';
 import { NavMain } from '@/components/nav-main';
 import { NavUser } from '@/components/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
-import { type NavItem } from '@/types';
-import { Link } from '@inertiajs/react';
-import { BookOpen, Folder, LayoutGrid } from 'lucide-react';
+import { type NavGroup } from '@/types';
+import { Link, usePage } from '@inertiajs/react';
+import { BookOpen } from 'lucide-react';
+import { getAdminNavigation } from '@/navigation/admin-navigation';
+import { getProjectNavigation } from '@/navigation/project-navigation';
+import { getStaffNavigation } from '@/navigation/staff-navigation';
+import { getCommonNavigation } from '@/navigation/common-navigation';
 import AppLogo from './app-logo';
 
-const mainNavItems: NavItem[] = [
-    {
-        title: 'Dashboard',
-        href: '/dashboard',
-        icon: LayoutGrid,
-    },
-];
-
-const footerNavItems: NavItem[] = [
-    {
-        title: 'Repository',
-        href: 'https://github.com/laravel/react-starter-kit',
-        icon: Folder,
-    },
-    {
-        title: 'Documentation',
-        href: 'https://laravel.com/docs/starter-kits#react',
-        icon: BookOpen,
-    },
-];
 
 export function AppSidebar() {
+    const { auth } = usePage().props as any;
+    const user = auth?.user;
+    
+    if (!user) {
+        return null;
+    }
+    
+    // Extract role types and permissions
+    const roleTypes = user.dashboard_types || [];
+    const permissions = user.permissions || [];
+    const isSuperAdmin = user.is_super_admin || false;
+    
+    // Determine which navigation groups to show based on role types
+    const navGroups: NavGroup[] = [];
+    
+    // Add common items
+    navGroups.push(getCommonNavigation());
+    
+    // Add administration items if user has administration access
+    if (roleTypes.includes('administration') || isSuperAdmin) {
+        const adminNavGroups = getAdminNavigation(permissions, isSuperAdmin);
+        navGroups.push(...adminNavGroups);
+    }
+    
+    // Add project items if user has project access
+    if (roleTypes.includes('project')) {
+        const projectNavGroups = getProjectNavigation(permissions);
+        navGroups.push(...projectNavGroups);
+    }
+    
+    // Add staff items if user has staff access
+    if (roleTypes.includes('staff')) {
+        const staffNavGroups = getStaffNavigation(permissions);
+        navGroups.push(...staffNavGroups);
+    }
+    
     return (
         <Sidebar collapsible="icon" variant="inset">
             <SidebarHeader>
@@ -44,11 +64,13 @@ export function AppSidebar() {
             </SidebarHeader>
 
             <SidebarContent>
-                <NavMain items={mainNavItems} />
+                {navGroups.map((group, index) => (
+                    <NavMain key={`${group.title}-${index}`} title={group.title} items={group.items} />
+                ))}
             </SidebarContent>
 
             <SidebarFooter>
-                <NavFooter items={footerNavItems} className="mt-auto" />
+                <NavFooter items={[]} className="mt-auto" />
                 <NavUser />
             </SidebarFooter>
         </Sidebar>

@@ -2,6 +2,9 @@
 
 namespace Database\Seeders;
 
+use App\Models\Permission;
+use App\Models\Role;
+use App\Models\User;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
@@ -31,7 +34,7 @@ class LaratrustSeeder extends Seeder
         foreach ($config as $key => $modules) {
 
             // Create a new role
-            $role = \App\Models\Role::firstOrCreate([
+            $role = Role::firstOrCreate([
                 'name' => $key,
                 'display_name' => ucwords(str_replace('_', ' ', $key)),
                 'description' => ucwords(str_replace('_', ' ', $key))
@@ -47,7 +50,7 @@ class LaratrustSeeder extends Seeder
 
                     $permissionValue = $mapPermission->get($perm);
 
-                    $permissions[] = \App\Models\Permission::firstOrCreate([
+                    $permissions[] = Permission::firstOrCreate([
                         'name' => $module . '-' . $permissionValue,
                         'display_name' => ucfirst($permissionValue) . ' ' . ucfirst($module),
                         'description' => ucfirst($permissionValue) . ' ' . ucfirst($module),
@@ -63,7 +66,7 @@ class LaratrustSeeder extends Seeder
             if (Config::get('laratrust_seeder.create_users')) {
                 $this->command->info("Creating '{$key}' user");
                 // Create default user for each role
-                $user = \App\Models\User::create([
+                $user = User::create([
                     'name' => ucwords(str_replace('_', ' ', $key)),
                     'email' => $key.'@app.com',
                     'password' => bcrypt('password')
@@ -93,7 +96,7 @@ class LaratrustSeeder extends Seeder
             DB::table('permissions')->truncate();
 
             if (Config::get('laratrust_seeder.create_users')) {
-                $usersTable = (new \App\Models\User)->getTable();
+                $usersTable = (new User)->getTable();
                 DB::table($usersTable)->truncate();
             }
         }

@@ -1,7 +1,8 @@
-import { Head } from '@inertiajs/react';
+import { Head, Link } from '@inertiajs/react';
 import AppLayout from '@/layouts/app-layout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { Users, Shield, BarChart3 } from 'lucide-react';
 
 interface Props {
@@ -16,10 +17,17 @@ interface Props {
         total_users: number;
         total_roles: number;
         total_permissions: number;
+        total_dashboard_types: number;
     };
+    dashboard_types?: {
+        id: number;
+        name: string;
+        display_name: string;
+        description?: string;
+    }[];
 }
 
-export default function AdminDashboard({ user, is_super_admin, permissions, stats }: Props) {
+export default function AdminDashboard({ user, is_super_admin, permissions, stats, dashboard_types }: Props) {
     return (
         <AppLayout>
             <Head title="Admin Dashboard" />
@@ -37,7 +45,7 @@ export default function AdminDashboard({ user, is_super_admin, permissions, stat
                     </Badge>
                 </div>
 
-                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
                     <Card>
                         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                             <CardTitle className="text-sm font-medium">
@@ -49,6 +57,21 @@ export default function AdminDashboard({ user, is_super_admin, permissions, stat
                             <div className="text-2xl font-bold">{stats.total_users}</div>
                             <p className="text-xs text-muted-foreground">
                                 Registered users
+                            </p>
+                        </CardContent>
+                    </Card>
+
+                    <Card>
+                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                            <CardTitle className="text-sm font-medium">
+                                Dashboard Types
+                            </CardTitle>
+                            <Shield className="h-4 w-4 text-muted-foreground" />
+                        </CardHeader>
+                        <CardContent>
+                            <div className="text-2xl font-bold">{stats.total_dashboard_types}</div>
+                            <p className="text-xs text-muted-foreground">
+                                Available dashboard types
                             </p>
                         </CardContent>
                     </Card>
@@ -127,6 +150,28 @@ export default function AdminDashboard({ user, is_super_admin, permissions, stat
                     </CardContent>
                 </Card>
 
+                {dashboard_types && (
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Dashboard Types</CardTitle>
+                            <CardDescription>
+                                Available dashboard types in the system
+                            </CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                            <div className="grid gap-4 md:grid-cols-3">
+                                {dashboard_types.map((type) => (
+                                    <div key={type.id} className="rounded-lg border p-4">
+                                        <h3 className="font-medium">{type.display_name}</h3>
+                                        <p className="text-sm text-muted-foreground mb-2">{type.name}</p>
+                                        <p className="text-sm">{type.description}</p>
+                                    </div>
+                                ))}
+                            </div>
+                        </CardContent>
+                    </Card>
+                )}
+
                 <Card>
                     <CardHeader>
                         <CardTitle>Admin Functions</CardTitle>
@@ -135,19 +180,38 @@ export default function AdminDashboard({ user, is_super_admin, permissions, stat
                         </CardDescription>
                     </CardHeader>
                     <CardContent>
-                        <div className="space-y-2">
-                            <p className="text-sm text-muted-foreground">
-                                • User management (based on permissions)
-                            </p>
-                            <p className="text-sm text-muted-foreground">
-                                • Role and permission management
-                            </p>
-                            <p className="text-sm text-muted-foreground">
-                                • System reports and analytics
-                            </p>
-                            <p className="text-sm text-muted-foreground">
-                                • Configuration management
-                            </p>
+                        <div className="grid gap-4 md:grid-cols-2">
+                            <div className="space-y-2">
+                                <h4 className="font-medium">Role Management</h4>
+                                <div className="space-y-1">
+                                    <Button variant="outline" size="sm" asChild className="w-full justify-start">
+                                        <Link href={route('admin.roles.index')}>
+                                            <Shield className="mr-2 h-4 w-4" />
+                                            Manage Roles
+                                        </Link>
+                                    </Button>
+                                    <Button variant="outline" size="sm" asChild className="w-full justify-start">
+                                        <Link href={route('admin.permissions.index')}>
+                                            <BarChart3 className="mr-2 h-4 w-4" />
+                                            Manage Permissions
+                                        </Link>
+                                    </Button>
+                                </div>
+                            </div>
+                            <div className="space-y-2">
+                                <h4 className="font-medium">System Management</h4>
+                                <div className="space-y-1">
+                                    <p className="text-sm text-muted-foreground">
+                                        • User management (coming soon)
+                                    </p>
+                                    <p className="text-sm text-muted-foreground">
+                                        • System reports (coming soon)
+                                    </p>
+                                    <p className="text-sm text-muted-foreground">
+                                        • Configuration (coming soon)
+                                    </p>
+                                </div>
+                            </div>
                         </div>
                     </CardContent>
                 </Card>

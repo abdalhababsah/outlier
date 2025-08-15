@@ -11,24 +11,16 @@ import { useInitials } from '@/hooks/use-initials';
 import { cn } from '@/lib/utils';
 import { type BreadcrumbItem, type NavItem, type SharedData } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
-import { BookOpen, Folder, LayoutGrid, Menu, Search } from 'lucide-react';
+import { BookOpen, Menu, Search } from 'lucide-react';
+import { getCommonNavigation } from '@/navigation/common-navigation';
 import AppLogo from './app-logo';
 import AppLogoIcon from './app-logo-icon';
 
-const mainNavItems: NavItem[] = [
-    {
-        title: 'Dashboard',
-        href: '/dashboard',
-        icon: LayoutGrid,
-    },
-];
+// Get common navigation items
+const mainNavItems = getCommonNavigation().items;
 
+// Documentation link only
 const rightNavItems: NavItem[] = [
-    {
-        title: 'Repository',
-        href: 'https://github.com/laravel/react-starter-kit',
-        icon: Folder,
-    },
     {
         title: 'Documentation',
         href: 'https://laravel.com/docs/starter-kits#react',
@@ -45,7 +37,13 @@ interface AppHeaderProps {
 export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
     const page = usePage<SharedData>();
     const { auth } = page.props;
+    const user = auth?.user;
     const getInitials = useInitials();
+    
+    // Get role-specific navigation based on user's role types
+    const roleTypes = user?.dashboard_types || [];
+    const permissions = user?.permissions || [];
+    const isSuperAdmin = user?.is_super_admin || false;
     return (
         <>
             <div className="border-b border-sidebar-border/80">

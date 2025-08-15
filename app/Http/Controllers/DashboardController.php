@@ -6,6 +6,10 @@ use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
 use Inertia\Inertia;
 use Inertia\Response;
+use App\Models\User;
+use App\Models\Role;
+use App\Models\Permission;
+use App\Models\DashboardType;
 
 class DashboardController extends Controller
 {
@@ -43,15 +47,19 @@ class DashboardController extends Controller
             abort(403, 'Access denied. Admin role required.');
         }
 
+        $dashboardTypes = DashboardType::all();
+        
         return Inertia::render('Admin/Dashboard', [
             'user' => $user,
             'is_super_admin' => $user->isSuperAdmin(),
             'permissions' => $user->permissions()->pluck('name')->toArray(),
             'stats' => [
-                'total_users' => \App\Models\User::count(),
-                'total_roles' => \App\Models\Role::count(),
-                'total_permissions' => \App\Models\Permission::count(),
-            ]
+                'total_users' => User::count(),
+                'total_roles' => Role::count(),
+                'total_permissions' => Permission::count(),
+                'total_dashboard_types' => $dashboardTypes->count(),
+            ],
+            'dashboard_types' => $dashboardTypes
         ]);
     }
 

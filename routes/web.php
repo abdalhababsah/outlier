@@ -12,10 +12,18 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Main dashboard - redirects to role-specific dashboard
     Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
     
-    // Role-specific dashboards
-    Route::get('admin/dashboard', [DashboardController::class, 'adminDashboard'])->name('admin.dashboard');
-    Route::get('project-owner/dashboard', [DashboardController::class, 'projectOwnerDashboard'])->name('project-owner.dashboard');
-    Route::get('staff/dashboard', [DashboardController::class, 'staffDashboard'])->name('staff.dashboard');
+    // Role-specific dashboards with access control
+    Route::middleware(['role.access:administration'])->group(function () {
+        Route::get('admin/dashboard', [DashboardController::class, 'adminDashboard'])->name('admin.dashboard');
+    });
+    
+    Route::middleware(['role.access:project'])->group(function () {
+        Route::get('project-owner/dashboard', [DashboardController::class, 'projectOwnerDashboard'])->name('project-owner.dashboard');
+    });
+    
+    Route::middleware(['role.access:staff'])->group(function () {
+        Route::get('staff/dashboard', [DashboardController::class, 'staffDashboard'])->name('staff.dashboard');
+    });
     
     // API endpoint for permission checking
     Route::post('check-permission', [DashboardController::class, 'checkPermission'])->name('check-permission');
@@ -23,3 +31,4 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
 require __DIR__.'/settings.php';
 require __DIR__.'/auth.php';
+require __DIR__.'/admin.php';
